@@ -4,6 +4,7 @@ using PlannerAgent.Services.Clients;
 using PlannerAgent.Services;
 using PlannerAgent.Services.Clients.Agents;
 using PlannerAgent.Logic;
+using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
