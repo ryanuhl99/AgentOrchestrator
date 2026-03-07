@@ -1,7 +1,7 @@
-using Common.Enums;
-using Common.Models;
+using PlannerAgent.Common.Enums;
+using PlannerAgent.Common.Models;
 
-namespace Services.Clients.Agents;
+namespace PlannerAgent.Services.Clients.Agents;
 
 public class ReviewAgentClient : IAgent
 {

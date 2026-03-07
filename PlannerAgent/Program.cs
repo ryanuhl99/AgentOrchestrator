@@ -1,14 +1,28 @@
-using Common.Models;
-using Common.Utils;
-using Services.Clients;
-using Services;
-using Services.Clients.Agents;
-using Logic;
+using PlannerAgent.Common.Models;
+using PlannerAgent.Common.Utils;
+using PlannerAgent.Services.Clients;
+using PlannerAgent.Services;
+using PlannerAgent.Services.Clients.Agents;
+using PlannerAgent.Logic;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Configuration.AddJsonFile("appsettings.local.json", optional: true);
+
+builder.Logging.ClearProviders();
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Logging.AddConsole();
+    builder.Logging.AddDebug();
+}
+else
+{
+    builder.Logging.AddConsole();
+}
 
 builder.Services.AddScoped<LlmService>();
 builder.Services.AddScoped<PlannerLogic>();

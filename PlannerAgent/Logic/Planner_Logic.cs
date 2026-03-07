@@ -1,8 +1,8 @@
-using Common.Models;
-using Services;
-using Common.Utils;
+using PlannerAgent.Common.Models;
+using PlannerAgent.Services;
+using PlannerAgent.Common.Utils;
 
-namespace Logic;
+namespace PlannerAgent.Logic;
 
 public class PlannerLogic (
     LlmService llmService,

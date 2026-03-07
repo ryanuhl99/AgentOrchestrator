@@ -1,7 +1,7 @@
-using Common.Models;
+using PlannerAgent.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Controllers;
+namespace PlannerAgent.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

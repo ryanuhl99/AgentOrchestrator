@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResearchAgent", "ResearchAg
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReviewAgent", "ReviewAgent\ReviewAgent.csproj", "{4CBCF73E-5097-4BD9-AA56-5563BA625440}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infra", "Infra\Infra.csproj", "{11AB17CE-B423-4D59-B319-BF9EDDCF5470}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{4CBCF73E-5097-4BD9-AA56-5563BA625440}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4CBCF73E-5097-4BD9-AA56-5563BA625440}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4CBCF73E-5097-4BD9-AA56-5563BA625440}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11AB17CE-B423-4D59-B319-BF9EDDCF5470}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11AB17CE-B423-4D59-B319-BF9EDDCF5470}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11AB17CE-B423-4D59-B319-BF9EDDCF5470}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11AB17CE-B423-4D59-B319-BF9EDDCF5470}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

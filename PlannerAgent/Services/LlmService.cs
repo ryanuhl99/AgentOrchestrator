@@ -1,5 +1,5 @@
 
-namespace Services;
+namespace PlannerAgent.Services;
 
 public class LlmService
 {

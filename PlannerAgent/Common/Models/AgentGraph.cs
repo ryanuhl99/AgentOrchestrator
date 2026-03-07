@@ -1,5 +1,5 @@
 
-namespace Common.Models;
+namespace PlannerAgent.Common.Models;
 
 public class AgentGraph
 {

@@ -1,8 +1,8 @@
-using Common.Models;
-using Common.Enums;
-using Services.Clients.Agents;
+using PlannerAgent.Common.Models;
+using PlannerAgent.Common.Enums;
+using PlannerAgent.Services.Clients.Agents;
 
-namespace Common.Utils;
+namespace PlannerAgent.Common.Utils;
 
 public class AgentResolver
 {

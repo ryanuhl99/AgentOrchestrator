@@ -1,5 +1,5 @@
 
-namespace Common.Enums;
+namespace PlannerAgent.Common.Enums;
 
 public enum AgentTypeEnum
 {
