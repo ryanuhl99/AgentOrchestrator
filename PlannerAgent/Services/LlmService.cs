@@ -50,6 +50,7 @@ public class LlmService(LlmClient llmClient)
         agent_type naming conventions ->  ResearchAgent, CodeAgent, ReviewAgent
 
         Return JSON only.
+        Do not include markdown formatting or code blocks.
 
         {
         "tasks": [

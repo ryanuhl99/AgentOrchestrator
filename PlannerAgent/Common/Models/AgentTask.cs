@@ -3,19 +3,17 @@ using PlannerAgent.Common.Enums;
 
 namespace PlannerAgent.Common.Models;
 
-public class AgentTask (
-    string id,
-    AgentTypeEnum agentType,
-    string prompt,
-    List<string> dependents
-)
+public class AgentTask
 {
-    public string Id { get; set; } = id;
+    public string Id { get; set; } = "";
 
     [JsonPropertyName("agent_type")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public AgentTypeEnum AgentType { get; set; } = agentType;
-    public string Prompt { get; set; } = prompt;
-    public List<string> Dependents { get; set; } = dependents;
+    public AgentTypeEnum AgentType { get; set; }
+
+    public string Prompt { get; set; } = "";
+
+    public List<string> Dependents { get; set; } = [];
+
     public TaskStateEnum TaskState { get; set; } = TaskStateEnum.Pending;
 }

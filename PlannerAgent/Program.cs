@@ -12,6 +12,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Configuration.AddJsonFile("appsettings.local.json", optional: true);
+builder.WebHost.UseUrls("http://0.0.0.0:8080");
 
 builder.Logging.ClearProviders();
 

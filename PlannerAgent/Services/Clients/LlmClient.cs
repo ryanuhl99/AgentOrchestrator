@@ -64,6 +64,25 @@ public class LlmClient
                 }
 
                 var body = await response.Content.ReadFromJsonAsync<OpenAiLlmResponse>();
+                var jsonContent = body?.Choices?[0].Message.Content ?? "";
+
+                if (string.IsNullOrWhiteSpace(jsonContent))
+                {
+                    throw new Exception("OpenAi Completions endpoint returned empty response");
+                }
+
+                jsonContent = jsonContent
+                    .Replace("```json", "")
+                    .Replace("```", "")
+                    .Trim();
+
+                var graph = JsonSerializer.Deserialize<AgentGraph>(
+                    jsonContent,
+                    new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    }
+                ) ?? throw new Exception("OpenAi Completions content failed to deserialize into graph object");
 
                 sw.Stop();
 
@@ -78,7 +97,7 @@ public class LlmClient
 
                 return new LlmResponseDto
                 {
-                    Json = body?.Choices?.FirstOrDefault()?.Message?.Content ?? "",
+                    Graph = graph,
                     SuccessResponse = body,
                     Latency = sw.ElapsedMilliseconds
                 };
@@ -115,7 +134,7 @@ public class LlmClient
 
                 return new LlmResponseDto
                 {
-                    Json = JsonSerializer.Serialize(error),
+                    Graph = new(),
                     FailResponse = error,
                     Latency = sw.ElapsedMilliseconds
                 };
@@ -139,7 +158,7 @@ public class LlmClient
 
         return new LlmResponseDto
         {
-            Json = JsonSerializer.Serialize(error),
+            Graph = new(),
             FailResponse = error,
             Latency = sw.ElapsedMilliseconds
         };

@@ -14,10 +14,14 @@ public class PlannerLogic (
 
     public async Task<RunPromptResponse> RunPrompt(RunPromptRequest request)
     {
-        // call llm
+        try
+        {
+            var initLlmResponse = await _llmService.GetLlmCompletionContent(request);
+            
+            return new RunPromptResponse();
+        }
         // build graph
         // schedule calls
         // format prompt response
-        return new RunPromptResponse();
     }
 }
