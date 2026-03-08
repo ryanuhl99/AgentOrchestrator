@@ -6,12 +6,10 @@ namespace PlannerAgent.Logic;
 
 public class PlannerLogic (
     LlmService llmService,
-    GraphBuilder graphBuilder,
     PlannerService plannerService
 )
 {
     private readonly LlmService _llmService = llmService;
-    private readonly GraphBuilder _graphBuilder = graphBuilder;
     private readonly PlannerService _plannerService = plannerService;
 
     public async Task<RunPromptResponse> RunPrompt(RunPromptRequest request)

@@ -42,9 +42,12 @@ public class LlmService(LlmClient llmClient)
         5. Dependencies must form a Directed Acyclic Graph (DAG).
         Tasks cannot depend on themselves and circular dependencies are not allowed.
 
-        Important: dependencies should be evaluated and determined carefully. It is possible for a prompt to contain a request for code research on one particular topic, and a request for code evaluation that is unrelated to said research.
+        Important: dependencies should be evaluated and determined carefully. It is possible for a prompt to contain a request for code research on one particular topic, and a request for code evaluation that is unrelated to said research. 
 
         OUTPUT FORMAT
+
+        Requirements:
+        agent_type naming conventions ->  ResearchAgent, CodeAgent, ReviewAgent
 
         Return JSON only.
 
