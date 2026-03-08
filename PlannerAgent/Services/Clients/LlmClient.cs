@@ -3,6 +3,8 @@ using System.Net.Http.Headers;
 using PlannerAgent.Common.Models;
 using System.Net.Http;
 using PlannerAgent.Common.Enums;
+using System.Diagnostics;
+using System.Text.Json;
 
 namespace PlannerAgent.Services.Clients;
 
@@ -22,40 +24,124 @@ public class LlmClient
         _logger = logger;
     }
 
-    public async Task<string> CompleteAsync(string prompt)
+    public async Task<LlmResponseDto> CompleteAsync(string prompt)
     {
-        try
+        var sw = Stopwatch.StartNew();
+        const int maxRetries = 3;
+        int retries = 0;
+        OpenAiErrorResponse? error = null;
+
+        while (retries <= maxRetries)
         {
-            var uri = "/v1/chat/completions";
-            using var response = await _client.PostAsJsonAsync(uri, new
+            try
             {
-                model = "gpt-4o-mini",
-                messages = new[]
+                var response = await _client.PostAsJsonAsync("/v1/chat/completions", new
                 {
-                    new { role = "user", content = prompt }
+                    model = "gpt-4o-mini",
+                    messages = new[]
+                    {
+                        new { role = "user", content = prompt }
+                    }
+                });
+
+                // retryable errors
+                if ((int)response.StatusCode == 429 ||
+                    (int)response.StatusCode >= 500)
+                {
+                    throw new HttpRequestException(
+                        $"Retryable OpenAI error {(int)response.StatusCode}"
+                    );
                 }
-            });
 
-            if (!response.IsSuccessStatusCode)
-            {
-                var error = await response.Content.ReadFromJsonAsync<OpenAiErrorResponse>();
-                throw new HttpRequestException($"Error at OpenAi Completions endpoint: {error?.Error?.Message}");
+                // non-retryable API errors
+                if (!response.IsSuccessStatusCode)
+                {
+                    error = await response.Content.ReadFromJsonAsync<OpenAiErrorResponse>();
+
+                    throw new HttpRequestException(
+                        $"OpenAI error: {error?.Error?.Message}"
+                    );
+                }
+
+                var body = await response.Content.ReadFromJsonAsync<OpenAiLlmResponse>();
+
+                sw.Stop();
+
+                _logger.LogAgentInfo(
+                    AgentTypeEnum.PlannerAgent.ToString(),
+                    "task_decomposition",
+                    body?.Usage?.PromptTokens ?? 0,
+                    body?.Usage?.CompletionTokens ?? 0,
+                    sw.ElapsedMilliseconds,
+                    true
+                );
+
+                return new LlmResponseDto
+                {
+                    Json = body?.Choices?.FirstOrDefault()?.Message?.Content ?? "",
+                    SuccessResponse = body,
+                    Latency = sw.ElapsedMilliseconds
+                };
             }
+            catch (HttpRequestException ex) when (retries < maxRetries)
+            {
+                retries++;
 
-            var body = await response.Content.ReadFromJsonAsync<OpenAiLlmResponse>();
-            return body!.Choices[0].Message.Content;
+                var delay = TimeSpan.FromSeconds(Math.Pow(2, retries));
+
+                _logger.LogWarning(
+                    "Retrying OpenAI call (attempt {Retry}/{MaxRetries}) after {Delay}s: {Message}",
+                    retries,
+                    maxRetries,
+                    delay.TotalSeconds,
+                    ex.Message
+                );
+
+                await Task.Delay(delay);
+            }
+            catch (Exception ex)
+            {
+                sw.Stop();
+
+                _logger.LogAgentError(
+                    ex,
+                    AgentTypeEnum.PlannerAgent.ToString(),
+                    "task_decomposition",
+                    0,
+                    0,
+                    sw.ElapsedMilliseconds,
+                    false
+                );
+
+                return new LlmResponseDto
+                {
+                    Json = JsonSerializer.Serialize(error),
+                    FailResponse = error,
+                    Latency = sw.ElapsedMilliseconds
+                };
+            }
         }
-        catch (HttpRequestException hx)
+
+        // retries exhausted
+        sw.Stop();
+
+        var finalEx = new Exception("OpenAI call failed after max retries");
+
+        _logger.LogAgentError(
+            finalEx,
+            AgentTypeEnum.PlannerAgent.ToString(),
+            "task_decomposition",
+            0,
+            0,
+            sw.ElapsedMilliseconds,
+            false
+        );
+
+        return new LlmResponseDto
         {
-            _logger.LogAgentError(
-                hx,
-                AgentTypeEnum.PlannerAgent.ToString(),
-                
-            )
-        }
-        catch (Exception ex)
-        {
-            
-        }
+            Json = JsonSerializer.Serialize(error),
+            FailResponse = error,
+            Latency = sw.ElapsedMilliseconds
+        };
     }
 }

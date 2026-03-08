@@ -1,7 +1,7 @@
 
 namespace PlannerAgent.Common.Utils;
 
-public class GraphBuilder
+public static class GraphBuilder
 {
     
 }

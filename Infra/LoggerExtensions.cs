@@ -33,8 +33,7 @@ public static class LoggerExtensions
         int inputTokens,
         int outputTokens,
         long latencyMs,
-        bool isSuccess,
-        string errorMessage
+        bool isSuccess
     )
     {
         logger.LogError(
