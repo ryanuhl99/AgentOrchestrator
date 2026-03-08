@@ -99,7 +99,8 @@ public class LlmClient
                 {
                     Graph = graph,
                     SuccessResponse = body,
-                    Latency = sw.ElapsedMilliseconds
+                    Latency = sw.ElapsedMilliseconds,
+                    UserPrompt = prompt
                 };
             }
             catch (HttpRequestException ex) when (retries < maxRetries)
@@ -136,7 +137,8 @@ public class LlmClient
                 {
                     Graph = new(),
                     FailResponse = error,
-                    Latency = sw.ElapsedMilliseconds
+                    Latency = sw.ElapsedMilliseconds,
+                    UserPrompt = prompt
                 };
             }
         }
@@ -160,7 +162,8 @@ public class LlmClient
         {
             Graph = new(),
             FailResponse = error,
-            Latency = sw.ElapsedMilliseconds
+            Latency = sw.ElapsedMilliseconds,
+            UserPrompt = prompt
         };
     }
 }
