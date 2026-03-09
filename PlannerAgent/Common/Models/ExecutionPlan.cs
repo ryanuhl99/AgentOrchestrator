@@ -1,5 +1,5 @@
 
-
+using Shared.Models;
 namespace PlannerAgent.Common.Models;
 
 public class ExecutionPlan

@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Infra;
-using PlannerAgent.Common.Enums;
+using Shared.Enums;
+using Shared.Models;
 using PlannerAgent.Common.Models;
 using PlannerAgent.Common.Utils;
 using PlannerAgent.Services.Clients.Agents;

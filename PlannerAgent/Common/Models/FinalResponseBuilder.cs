@@ -1,5 +1,5 @@
-
-using PlannerAgent.Common.Enums;
+using Shared.Models;
+using Shared.Enums;
 using System.Text;
 
 namespace PlannerAgent.Common.Models;

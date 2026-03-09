@@ -1,7 +1,7 @@
 
 using System.Text.Json.Serialization;
 
-namespace PlannerAgent.Common.Models;
+namespace Shared.Models;
 
 public class OpenAiLlmResponse
 {

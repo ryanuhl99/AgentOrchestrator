@@ -2,7 +2,8 @@ using Infra;
 using System.Net.Http.Headers;
 using PlannerAgent.Common.Models;
 using System.Net.Http;
-using PlannerAgent.Common.Enums;
+using Shared.Enums;
+using Shared.Models;
 using System.Diagnostics;
 using System.Text.Json;
 

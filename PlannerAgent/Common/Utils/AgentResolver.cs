@@ -1,5 +1,5 @@
-using PlannerAgent.Common.Models;
-using PlannerAgent.Common.Enums;
+using Shared.Models;
+using Shared.Enums;
 using PlannerAgent.Services.Clients.Agents;
 
 namespace PlannerAgent.Common.Utils;

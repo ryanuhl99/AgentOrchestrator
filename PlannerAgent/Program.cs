@@ -11,19 +11,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// for storing api keys/secrets; never exposed
 builder.Configuration.AddJsonFile("appsettings.local.json", optional: true);
-builder.WebHost.UseUrls("http://0.0.0.0:8080");
 
+builder.WebHost.UseUrls("http://0.0.0.0:8080");
 builder.Logging.ClearProviders();
+
+builder.Logging.AddConsole();
 
 if (builder.Environment.IsDevelopment())
 {
-    builder.Logging.AddConsole();
     builder.Logging.AddDebug();
-}
-else
-{
-    builder.Logging.AddConsole();
 }
 
 builder.Services.AddScoped<LlmService>();

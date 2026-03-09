@@ -1,5 +1,5 @@
 
-namespace PlannerAgent.Common.Models;
+namespace Shared.Models;
 
 public class OpenAiErrorResponse
 {

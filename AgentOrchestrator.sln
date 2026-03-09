@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReviewAgent", "ReviewAgent\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infra", "Infra\Infra.csproj", "{11AB17CE-B423-4D59-B319-BF9EDDCF5470}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{6D594272-66F0-4370-92E2-3524340D8198}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,5 +44,9 @@ Global
 		{11AB17CE-B423-4D59-B319-BF9EDDCF5470}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11AB17CE-B423-4D59-B319-BF9EDDCF5470}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11AB17CE-B423-4D59-B319-BF9EDDCF5470}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D594272-66F0-4370-92E2-3524340D8198}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D594272-66F0-4370-92E2-3524340D8198}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D594272-66F0-4370-92E2-3524340D8198}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D594272-66F0-4370-92E2-3524340D8198}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
