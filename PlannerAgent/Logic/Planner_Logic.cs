@@ -17,11 +17,12 @@ public class PlannerLogic (
         try
         {
             var initLlmResponse = await _llmService.GetLlmCompletionContent(request);
-            
-            return new RunPromptResponse();
+            var executionPlan = await _plannerService.ExecuteTasks(initLlmResponse);
+            return FinalResponseBuilder.Build(executionPlan);
         }
-        // build graph
-        // schedule calls
-        // format prompt response
+        catch (Exception ex)
+        {
+            
+        }
     }
 }

@@ -42,19 +42,19 @@ builder.Services.AddHttpClient<LlmClient>(client =>
 
 builder.Services.AddHttpClient<ResearchAgentClient>(client =>
 {
-    client.BaseAddress = new Uri("http://research-agent");
+    client.BaseAddress = new Uri("http://ResearchAgent:8080");
     client.Timeout = TimeSpan.FromSeconds(30);
 });
 
 builder.Services.AddHttpClient<CodeAgentClient>(client =>
 {
-    client.BaseAddress = new Uri("http://code-agent");
+    client.BaseAddress = new Uri("http://CodeAgent:8080");
     client.Timeout = TimeSpan.FromSeconds(30);
 });
 
 builder.Services.AddHttpClient<ReviewAgentClient>(client =>
 {
-    client.BaseAddress = new Uri("http://review-agent");
+    client.BaseAddress = new Uri("http://ReviewAgent:8080");
     client.Timeout = TimeSpan.FromSeconds(30);
 });
 

@@ -40,17 +40,14 @@ public class PlannerService(AgentResolver resolver, ILogger<PlannerService> logg
                 try
                 {
                     var agent = _resolver.Resolve(task.AgentType);
-
                     var runTask = agent.ExecuteAsync(task);
-
                     inFlight[runTask] = task;
                 }
                 catch (Exception ex)
                 {
                     sw.Stop();
-
                     task.TaskState = TaskStateEnum.Failed;
-
+                    // need to log workflow errors here, not agent errors
                     _logger.LogAgentError(
                         ex,
                         task.AgentType.ToString(),
@@ -63,14 +60,9 @@ public class PlannerService(AgentResolver resolver, ILogger<PlannerService> logg
                 }
             }
 
-            if (inFlight.Count == 0)
-                break;
-
             // wait for first task to finish
             var finishedTask = await Task.WhenAny(inFlight.Keys);
-
             var finishedAgentTask = inFlight[finishedTask];
-
             inFlight.Remove(finishedTask);
 
             AgentResponse response;
@@ -82,7 +74,7 @@ public class PlannerService(AgentResolver resolver, ILogger<PlannerService> logg
             catch (Exception ex)
             {
                 finishedAgentTask.TaskState = TaskStateEnum.Failed;
-
+                // need to log workflow errors here, not agent errors
                 _logger.LogAgentError(
                     ex,
                     finishedAgentTask.AgentType.ToString(),
@@ -99,14 +91,14 @@ public class PlannerService(AgentResolver resolver, ILogger<PlannerService> logg
             finishedAgentTask.TaskState = TaskStateEnum.Completed;
 
             completed[finishedAgentTask.Id] = response;
-
             var finishedId = finishedAgentTask.Id;
 
             // check dependents
             foreach (var dependent in graph.Tasks.Where(t => t.Dependents.Contains(finishedId)))
             {
                 if (dependent.TaskState == TaskStateEnum.Pending &&
-                    dependent.Dependents.All(dep => completed.ContainsKey(dep)))
+                    dependent.Dependents.All(dep => completed.ContainsKey(dep) &&
+                        completed[dep].IsSuccess))
                 {
                     taskQueue.Enqueue(dependent);
                 }
