@@ -1,19 +1,9 @@
-using PlannerAgent.Common.Enums;
-using PlannerAgent.Common.Models;
 
 namespace PlannerAgent.Services.Clients.Agents;
 
-public class ReviewAgentClient : IAgent
+public class ReviewAgentClient(HttpClient client, ILogger<ReviewAgentClient> logger)
+    : AgentClientBase(client, logger)
 {
-    public async Task<AgentResponse> ExecuteAsync(AgentTask task)
-    {
-        return new AgentResponse(
-            "",
-            false,
-            "",
-            1,
-            1,
-            1
-        );
-    }
+    protected override string AgentName => "ReviewAgent";
+    protected override string Endpoint => "api/reviewagent";
 }

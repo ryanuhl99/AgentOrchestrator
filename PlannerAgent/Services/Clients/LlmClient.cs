@@ -59,7 +59,7 @@ public class LlmClient
                     error = await response.Content.ReadFromJsonAsync<OpenAiErrorResponse>();
 
                     throw new HttpRequestException(
-                        $"OpenAI error: {error?.Error?.Message}"
+                        $"OpenAI Completions error: {error?.Error?.Message}"
                     );
                 }
 
