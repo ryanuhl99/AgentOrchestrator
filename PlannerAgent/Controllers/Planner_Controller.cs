@@ -14,12 +14,16 @@ public class PlannerAgentController(PlannerLogic plannerLogic) : ControllerBase
     {
         try
         {
-            var response = await _plannerLogic.RunPrompt(request) ?? throw new Exception();
+            var response = await _plannerLogic.RunPrompt(request);
+            
+            if (!string.IsNullOrWhiteSpace(response.Error))
+                throw new Exception($"{response.Error}");
+
             return Ok(response);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            return BadRequest();
+            return StatusCode(500, $"Server error: {ex}");
         }
         
     }

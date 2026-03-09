@@ -17,12 +17,19 @@ public class PlannerLogic (
         try
         {
             var initLlmResponse = await _llmService.GetLlmCompletionContent(request);
+
+            if (initLlmResponse.FailResponse != null) 
+                throw new Exception($"LLM Error: {initLlmResponse.FailResponse.Error.Message}");
+
             var executionPlan = await _plannerService.ExecuteTasks(initLlmResponse);
             return FinalResponseBuilder.Build(executionPlan);
         }
         catch (Exception ex)
         {
-            
+            return new RunPromptResponse
+            {
+                Error = ex.Message
+            };
         }
     }
 }
