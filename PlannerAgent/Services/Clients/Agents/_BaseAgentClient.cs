@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Shared.Enums;
 using Shared.Models;
+using Infra;
 
 namespace PlannerAgent.Services.Clients.Agents;
 
@@ -8,6 +9,7 @@ public abstract class AgentClientBase : IAgent
 {
     protected abstract string AgentName { get; }
     protected abstract string Endpoint { get; }
+
     private readonly HttpClient _client;
     private readonly ILogger _logger;
 
@@ -19,6 +21,8 @@ public abstract class AgentClientBase : IAgent
 
     public async Task<AgentResponse> ExecuteAsync(AgentTask task)
     {
+        var sw = Stopwatch.StartNew();
+
         try
         {
             var response = await _client.PostAsJsonAsync(Endpoint, task);
@@ -27,38 +31,79 @@ public abstract class AgentClientBase : IAgent
             {
                 throw new HttpRequestException($"{AgentName} endpoint error: {response.StatusCode}");
             }
-            
-            var agentResponse = await response.Content.ReadFromJsonAsync<AgentResponse>() ?? throw new Exception($"Failed to deserialize agentResponse at {AgentName} ExecuteAsync call");
+
+            var agentResponse =
+                await response.Content.ReadFromJsonAsync<AgentResponse>()
+                ?? throw new Exception($"Failed to deserialize AgentResponse at {AgentName} ExecuteAsync");
+
+            sw.Stop();
 
             if (!agentResponse.IsSuccess)
             {
-                _logger.LogError("{AgentName} returned failed response to PlannerAgent on task: {TaskId} with error: {Error} at {Timestamp}", AgentName, task.Id, agentResponse.Error, DateTime.UtcNow);
+                _logger.LogAgentError(
+                    new Exception(agentResponse.Error ?? "Agent returned failure"),
+                    AgentName,
+                    task.Id,
+                    agentResponse.InputTokens,
+                    agentResponse.OutputTokens,
+                    sw.ElapsedMilliseconds,
+                    false
+                );
             }
             else
             {
-                _logger.LogInformation("{AgentName} returned success response to PlannerAgent on task: {TaskId} at {Timestamp}", AgentName, task.Id, DateTime.UtcNow);
+                _logger.LogAgentInfo(
+                    AgentName,
+                    task.Id,
+                    agentResponse.InputTokens,
+                    agentResponse.OutputTokens,
+                    sw.ElapsedMilliseconds,
+                    true
+                );
             }
 
             return agentResponse;
         }
         catch (HttpRequestException hx)
         {
-            _logger.LogError(hx, "{AgentName} endpoint HTTP error: {error} on task: {taskId} at {DateTime.UtcNow}", AgentName, hx.Message, task.Id, DateTime.UtcNow);  
+            sw.Stop();
+
+            _logger.LogAgentError(
+                hx,
+                AgentName,
+                task.Id,
+                0,
+                0,
+                sw.ElapsedMilliseconds,
+                false
+            );
+
             return new AgentResponse
             {
                 TaskId = task.Id,
                 IsSuccess = false,
-                Error = hx.Message,
+                Error = hx.Message
             };
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unexpected error at {AgentName} ExecuteAsync: {error} on task: {taskId} at {DateTime.UtcNow}", AgentName, ex.Message, task.Id, DateTime.UtcNow);  
+            sw.Stop();
+
+            _logger.LogAgentError(
+                ex,
+                AgentName,
+                task.Id,
+                0,
+                0,
+                sw.ElapsedMilliseconds,
+                false
+            );
+
             return new AgentResponse
             {
                 TaskId = task.Id,
                 IsSuccess = false,
-                Error = ex.Message,
+                Error = ex.Message
             };
         }
     }
