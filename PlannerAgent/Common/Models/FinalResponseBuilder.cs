@@ -12,7 +12,7 @@ public static class FinalResponseBuilder
         var tasks = exePlan.Graph.Tasks;
         var responses = exePlan.Responses;
 
-        var rootTasks = tasks.Where(t => t.Dependents.Count == 0);
+        var rootTasks = tasks.Where(t => t.Dependencies.Count == 0);
 
         foreach (var root in rootTasks)
         {
@@ -52,7 +52,7 @@ public static class FinalResponseBuilder
         }
 
         // find children
-        var children = tasks.Where(t => t.Dependents.Contains(task.Id));
+        var children = tasks.Where(t => t.Dependencies.Contains(task.Id));
 
         foreach (var child in children)
         {
