@@ -23,6 +23,8 @@ public class LlmService(LlmClient llmClient)
         ReviewAgent
         - Reviews code or text output for correctness, security issues, and style violations.
 
+        Note: ResearchAgent, CodeAgent, and ReviewAgent are required naming conventions for agent_type field specified below.
+
         YOUR JOB
 
         Break the user request into a sequence of tasks assigned to these agents.
@@ -46,9 +48,6 @@ public class LlmService(LlmClient llmClient)
 
         OUTPUT FORMAT
 
-        Requirements:
-        agent_type naming conventions ->  ResearchAgent, CodeAgent, ReviewAgent
-
         Return JSON only.
         Do not include markdown formatting or code blocks.
 
@@ -58,7 +57,7 @@ public class LlmService(LlmClient llmClient)
             "id": "task1",
             "agent_type": "ResearchAgent",
             "prompt": "...",
-            "dependents": []
+            "dependencies": []
             }
         ]
         }

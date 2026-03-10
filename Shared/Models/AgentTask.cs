@@ -13,7 +13,7 @@ public class AgentTask
 
     public string Prompt { get; set; } = "";
 
-    public List<string> Dependents { get; set; } = [];
+    public List<string> Dependencies { get; set; } = [];
 
     public TaskStateEnum TaskState { get; set; } = TaskStateEnum.Pending;
 }

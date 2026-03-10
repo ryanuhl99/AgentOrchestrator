@@ -21,10 +21,17 @@ public class PlannerService(AgentResolver resolver, ILogger<PlannerService> logg
 
         var graph = responseObj.Graph;
 
+        _logger.LogInformation("Planner starting execution of graph: {@Graph}", graph);
+
         foreach (var node in graph.Tasks)
         {
-            if (node.Dependents.Count == 0)
+            if (node.Dependencies.Count == 0)
             {
+                _logger.LogInformation(
+                    "Enqueuing root task {TaskId} for agent {AgentType}",
+                    node.Id,
+                    node.AgentType
+                );
                 taskQueue.Enqueue(node);
             }
         }
@@ -40,23 +47,26 @@ public class PlannerService(AgentResolver resolver, ILogger<PlannerService> logg
 
                 try
                 {
+                    _logger.LogInformation(
+                        "Dispatching task {TaskId} to {AgentType}",
+                        task.Id,
+                        task.AgentType
+                    );
+
                     var agent = _resolver.Resolve(task.AgentType);
                     var runTask = agent.ExecuteAsync(task);
+
                     inFlight[runTask] = task;
                 }
                 catch (Exception ex)
                 {
-                    sw.Stop();
                     task.TaskState = TaskStateEnum.Failed;
-                    // need to log workflow errors here, not agent errors
-                    _logger.LogAgentError(
+    
+                    _logger.LogError(
                         ex,
-                        task.AgentType.ToString(),
+                        "Failed to dispatch task {TaskId} for agent {AgentType}",
                         task.Id,
-                        0,
-                        0,
-                        sw.ElapsedMilliseconds,
-                        false
+                        task.AgentType
                     );
                 }
             }
@@ -75,15 +85,11 @@ public class PlannerService(AgentResolver resolver, ILogger<PlannerService> logg
             catch (Exception ex)
             {
                 finishedAgentTask.TaskState = TaskStateEnum.Failed;
-                // need to log workflow errors here, not agent errors
-                _logger.LogAgentError(
+                _logger.LogError(
                     ex,
-                    finishedAgentTask.AgentType.ToString(),
+                    "Task {TaskId} executed by {AgentType} failed",
                     finishedAgentTask.Id,
-                    0,
-                    0,
-                    0,
-                    false
+                    finishedAgentTask.AgentType
                 );
 
                 continue;
@@ -92,19 +98,41 @@ public class PlannerService(AgentResolver resolver, ILogger<PlannerService> logg
             finishedAgentTask.TaskState = TaskStateEnum.Completed;
 
             completed[finishedAgentTask.Id] = response;
+
+            _logger.LogInformation(
+                "Task {TaskId} completed by {AgentType} with success={Success}",
+                finishedAgentTask.Id,
+                finishedAgentTask.AgentType,
+                response.IsSuccess
+            );
+
             var finishedId = finishedAgentTask.Id;
 
             // check dependents
-            foreach (var dependent in graph.Tasks.Where(t => t.Dependents.Contains(finishedId)))
+            foreach (var dependent in graph.Tasks.Where(t => t.Dependencies.Contains(finishedId)))
             {
                 if (dependent.TaskState == TaskStateEnum.Pending &&
-                    dependent.Dependents.All(dep => completed.ContainsKey(dep) &&
+                    dependent.Dependencies.All(dep => completed.ContainsKey(dep) &&
                         completed[dep].IsSuccess))
                 {
+                    _logger.LogInformation(
+                        "Scheduling dependent task {TaskId} for agent {AgentType}",
+                        dependent.Id,
+                        dependent.AgentType
+                    );
                     taskQueue.Enqueue(dependent);
+                }
+                else
+                {
+                    _logger.LogDebug(
+                        "Dependent task {TaskId} not ready yet. Waiting for remaining dependencies.",
+                        dependent.Id
+                    );
                 }
             }
         }
+
+        _logger.LogInformation("Planner execution finished. Completed {CompletedCount} tasks", completed.Count);
 
         return new ExecutionPlan
         {
