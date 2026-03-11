@@ -120,6 +120,13 @@ public class PlannerService(AgentResolver resolver, ILogger<PlannerService> logg
                         dependent.Id,
                         dependent.AgentType
                     );
+
+                    var context = dependent.Dependencies
+                        .Select(dep => $"Output from {dep}:\n{completed[dep].Output}")
+                        .ToList();
+
+                    dependent.Prompt += string.Join("\n\n", context);
+
                     taskQueue.Enqueue(dependent);
                 }
                 else
