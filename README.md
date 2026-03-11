@@ -259,7 +259,3 @@ What was deliberately omitted:
     - rigid task ordering
 
 These were omitted to allow the LLM to flexibly decompose requests with varying complexity.
-
-
-# NOTE:
-### In this implementation the scheduler enforces dependency ordering before dispatching dependent tasks. In a production system, outputs from dependency tasks would be injected into the dependent task’s prompt to provide additional context for downstream agents.
