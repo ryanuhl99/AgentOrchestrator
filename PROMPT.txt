@@ -1,0 +1,58 @@
+Overview
+You are building an internal developer productivity platform. One of its core capabilities is an AI-powered assistant that can handle complex, multi-step requests from engineers  things like "research this library, write an integration example, and review it for security issues." A single LLM call cannot reliably handle this - you need a system of specialised agents working together.
+
+Design and implement the orchestration layer that makes this possible.
+
+Background
+The system has three specialist agents already defined as interfaces:
+
+ResearchAgent — retrieves and summarizes relevant documentation, GitHub issues, Stack Overflow threads, and internal wiki pages
+
+CodeAgent — generates, refactors, or explains code given a specification
+
+ReviewAgent — audits code or text output for correctness, security issues, and style violations
+
+Each agent is independently deployable and may have variable latency. The ResearchAgent can take 8–15 seconds. The CodeAgent typically responds in 3–6 seconds. The ReviewAgent is fast, under 2 seconds, but depends on having CodeAgent output to review.
+
+You are building the PlannerAgent — the orchestrator that sits above all three.
+
+What You Need to Build
+1. Task Decomposition
+The PlannerAgent receives a free-text user request and must break it down into a typed list of AgentTask objects, each assigned to the appropriate specialist. This decomposition must be done by an LLM call that returns structured JSON. You are expected to design the prompt and the deserialisation logic.
+
+The output of decomposition must include a dependency graph — some tasks can run in parallel, others must wait for a predecessor's output. Your data model needs to express this.
+
+2. Parallel Execution with Dependency Awareness
+Tasks with no dependencies must be dispatched simultaneously. Tasks that depend on a predecessor's result must wait, receive that result as input context, and only then execute. You are responsible for the scheduling logic that walks the dependency graph and fires tasks at the right time.
+
+3. Partial Failure Handling
+Individual agents will fail. The ResearchAgent may time out. The CodeAgent may return a malformed response. The ReviewAgent may throw an unhandled exception. None of these should bring down the orchestration run.
+
+Your implementation must catch failures per agent, mark the corresponding AgentResult as failed with a reason, and continue the run with whatever results are available. The final synthesized response must acknowledge which steps succeed and which did not, rather than silently dropping failed outputs.
+
+4. Result Synthesis
+Once all agents have settled (succeeded or failed), the PlannerAgent must make a final LLM call that takes the collection of results and produces a coherent, unified response for the user. The synthesis prompt must include the original user request, the structured results from each agent, and explicit instructions for handling partial failures.
+
+5. Observability
+Every agent invocation must emit structured log entries containing: agent name, task ID, input token count, output token count, latency in milliseconds, and success or failure status. These logs must be emitted through the standard logging interface so they integrate with whatever sink the host application configures.
+
+Candidates can use C#/Java/Rust/Python - any LLM provider, and any libraries they prefer.
+
+Restrictions
+The following constraints are intentional. They exist to assess depth of understanding not to be worked around.
+
+Hard Constraints
+1. No orchestration frameworks for the core scheduler. The dependency graph walker must be hand-rolled. Temporal, Conductor, Prefect, and equivalent libraries are not permitted for the orchestration layer. If you reach for one, you've missed the point of the exercise.
+
+2. Write the decomposition prompt in full, inline. The LLM prompt used for task decomposition must appear in full in your code  not loaded from a file, not delegated to a helper, not hidden behind an abstraction. We want to read how you think about prompt engineering.
+
+3. Represent the dependency graph as an explicit data structure. The graph must not be implicit in async call order. Serialize it to JSON and include a sample in your submission showing what it looks like for a non-trivial request.
+
+Written Questions
+Answer these in a short README or inline comments. 
+
+Q1. Walk us through one scheduling decision your code makes. Pick a specific moment where Task B waits for Task A. Explain exactly how your code knows to wait, what data structure drives that decision, and what happens when Task A fails.
+
+Q2. What is the worst-case execution time of your scheduler, and why? Give a concrete answer in terms of the agent latencies provided. Show your reasoning.
+
+Q3. Write out your synthesis prompt and explain each section's purpose. What did you include? What did you deliberately leave out? Why?
